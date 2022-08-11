@@ -114,14 +114,14 @@
 // console.log(clock.start(5000));
 
 //? 
-// class Rabbit extends Object {
-//   constructor(name) {
-//     super()
-//     this.name = name;
-//   }
+class Rabbit extends Object {
+  constructor(name) {
+    super()
+    this.name = name;
+  }
 
-// }
+}
 
-// let rabbit = new Rabbit("Кроль");
+let rabbit = new Rabbit("Кроль");
 
-// console.log(rabbit.hasOwnProperty('name'));
+console.log(rabbit.hasOwnProperty('name'));
