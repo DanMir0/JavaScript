@@ -113,7 +113,9 @@
 // let clock = new ExtendedClock({template: 'h:m:s'})
 // console.log(clock.start(5000));
 
-//? 
+//? Но что если мы явно напишем "class Rabbit extends Object" – тогда результат будет отличаться от обычного "class Rabbit"?
+//? В чем разница?
+//? Ниже пример кода с таким наследованием (почему он не работает? исправьте его):
 class Rabbit extends Object {
   constructor(name) {
     super()
