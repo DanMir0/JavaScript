@@ -1,4 +1,8 @@
-const dropdownItem = document.querySelector('.dropdown-item')
-dropdownItem.addEventListener('click', (e) => {
-    e.classList.toggle('.d-none')
+const dropdownItem = document.querySelectorAll('.dropdown-item')
+
+dropdownItem.forEach(elem => {
+    const dropdownMenu =  elem.querySelector('.dropdown-menu')
+    elem.addEventListener('click', (e)=> {
+        dropdownMenu.classList.toggle('d-none')
+    }) 
 })
