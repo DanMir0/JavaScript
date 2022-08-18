@@ -137,24 +137,21 @@
 
 //? Не используя innerHTML, добавить в список несколько li с классом ‘new-item’ и текстом ‘item’ + номер li:
 //? Вручную номер li не ставить оно должно подставляться в зависимости от кол-ва лишек в списке.
-//! ИСПРАВИТЬ
-// const ulLi = document.querySelectorAll('ul li');
-// const ul = document.querySelector('ul')
-// const fragment = document.createDocumentFragment();
+const ul = document.querySelector('ul');
+const counts = 4;
+const totalCounts = ul.children.length + counts;
+for (let i = ul.children.length; i < totalCounts; i++) {
+    const li = document.createElement('li');
+    li.classList.add('new-item');
+    li.textContent = `item ${i+1}`;
+    ul.appendChild(li)
+}
 
-// for (let i = 0; i < ulLi.length; i++) {
-//     const itemLi = document.createElement('li');
-//     itemLi.setAttribute('class', 'new-item');
-//     itemLi.textContent = `item ${i+1 + ulLi.length}`
-//     fragment.appendChild(itemLi)
-// }
-
-// ul.appendChild(fragment)
 
 
 //? В каждую ссылку, которая находятся внутри списка ul  добавить по тегу strong (в каждую ссылку один - strong). 
 // const ulLink = document.querySelectorAll('ul li a')
-//! Исправить
+// ! Исправить
 // ulLink.forEach(elem => {
 //     const strong = document.createElement('strong');
 //     elem.insertAdjacentElement('beforebegin', strong)
@@ -175,15 +172,15 @@
 // mark.insertAdjacentText("beforeend", 'green')
 
 //? Отсортировать li внутри списка в обратном порядке (по тексту внутри)
-const list = document.querySelectorAll('li');
-const arrList = Array.from(list)
-arrList.sort((a, b) => b.textContent.localeCompare(a.textContent))
+// const list = document.querySelectorAll('li');
+// const arrList = Array.from(list)
+// arrList.sort((a, b) => b.textContent.localeCompare(a.textContent))
 
-list.forEach(elem => {
-    elem.remove()
-})
-const ul = document.querySelector('ul');
+// list.forEach(elem => {
+//     elem.remove()
+// })
+// const ul = document.querySelector('ul');
 
-arrList.forEach(elem => {
-    ul.appendChild(elem)
-})
+// arrList.forEach(elem => {
+//     ul.appendChild(elem)
+// })
