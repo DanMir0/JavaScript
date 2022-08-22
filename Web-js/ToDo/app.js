@@ -32,7 +32,7 @@ const tasks = [
 ];
 
 (function (arrOfTasks) {
-  // Переобразовываем массив объектов в объект объектов. (1)
+  // Переобразовываем массив объектов в объект объектов. (*)
   const objOfTasks = arrOfTasks.reduce((acc, task) => {
     acc[task._id] = task
     return acc
@@ -41,6 +41,10 @@ const tasks = [
   // Elemts UI.
   // Нашли контейнер, куда будем добавлять задачи.
   const listContainer = document.querySelector('.tasks-list-section .list-group');
+  listContainer.style.background = "#f7f0f0";
+
+  const incompleteTasksBtn = document.querySelector('.incomplete-tasks');
+
   // Находим форму.
   const form = document.forms['addTask'];
   // Находим inputTitle через форму.
@@ -50,11 +54,14 @@ const tasks = [
 
   // Events
   // Получает на вход объект задач.
+  checkEmptyListFrom(objOfTasks);
   renderAllTasks(objOfTasks);
   // На форму вешаем обработчик событий 'submit', функцию onFormSubmitHandler.
   form.addEventListener('submit', onFormSubmitHandler);
   // Повесили обработчик на весь список, в которой генерируется задача. Т.к. все элементы генерируются через JS и нет прямого доступа.
   listContainer.addEventListener('click', onDeletehandler);
+  listContainer.addEventListener('click', onPerformedhandler);
+  incompleteTasksBtn.addEventListener('click', onShowIncompleteTasks)
 
   function renderAllTasks(tasksList) {
     // Проверят перед ли объект задачи.
@@ -86,7 +93,7 @@ const tasks = [
   // которую сюда передали, основываясь на таске и возвращает li.
   function listItemTemplate({ _id, title, body } = {}) {
     const li = document.createElement('li');
-    li.classList.add('list-group-item', 'd-flex', 'align-items-center', 'flex-wrap', 'mt-2')
+    li.classList.add('list-group-item', 'mt-2')
     // При гинерации атрибут id добавляем на элемент, чтобы в дальйнешм опредять какой элемент нужно удалить.
     li.setAttribute('data-task-id', _id)
 
@@ -94,17 +101,26 @@ const tasks = [
     span.textContent = title;
     span.style.fontWeight = 'bold';
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = "Delete task";
-    deleteBtn.classList.add('btn', 'btn-danger', 'ml-auto', 'delete-btn')
-
     const article = document.createElement('p');
     article.textContent = body;
     article.classList.add('mt-2', 'w-100');
 
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = "Delete task";
+    deleteBtn.classList.add('btn', 'btn-danger', 'delete-btn')
+
+    const performedBtn = document.createElement('button');
+    performedBtn.textContent = "Done";
+    performedBtn.classList.add('btn', 'btn-success', 'performed-btn')
+
+    const divGroupBtn = document.createElement('div');
+    divGroupBtn.classList.add('d-flex', 'justify-content-between')
+    divGroupBtn.appendChild(performedBtn);
+    divGroupBtn.appendChild(deleteBtn);  
+   
     li.appendChild(span);
-    li.appendChild(deleteBtn);
     li.appendChild(article);
+    li.appendChild(divGroupBtn);
 
     return li;
   }
@@ -164,26 +180,79 @@ const tasks = [
     return isConfirm;
   }
 
+  //! проверка на пустоту
+  function checkEmptyListFrom(tasksList) {
+    const emptyTitle = document.querySelector('.title-empty')
+    if (!Object.keys(tasksList).length) {
+      emptyTitle.classList.remove('d-none')
+    } 
+  }
+
   function deleteTaskFromHtml(confirmed, el) {
     // Если подверждения не было, то ничего не делаем, иначе удаляем.
     if (!confirmed) return;
     el.remove();
   }
 
+  function perfomedTaskFromHtml(el) {
+    el.classList.add('.bg-info');
+    el.classList.toggle('bg-info')
+  }
+
   // Определяет на кого произошел клик.
   function onDeletehandler({ target }) {
     // Если по кнопке.
-    if (target.classList.contains('delete-btn')) {
-      // То находим родителя кнопки.
-      const parent = target.closest('[data-task-id]');
-      // Получаем id задачи.
-      const id = parent.dataset.taskId;
-      // Получаем статус удаления задачи (true, false).
-      const confirmed = deleteTask(id);
-      // Передаем статус удаления и элемента, которого хотим удалить.
-      deleteTaskFromHtml(confirmed, parent);
-      console.log(parent);
+    if (!target.classList.contains('delete-btn')) {
+      return
+    } 
+     // То находим родителя кнопки.
+     const parent = target.closest('[data-task-id]');
+     // Получаем id задачи.
+     const id = parent.dataset.taskId;
+     // Получаем статус удаления задачи (true, false).
+     const confirmed = deleteTask(id);
+     // Передаем статус удаления и элемента, которого хотим удалить.
+     deleteTaskFromHtml(confirmed, parent);
+     checkEmptyListFrom(objOfTasks);
+  }
+
+  //! ДЗ - 2 задачка
+  function onPerformedhandler({ target }) {
+    if (!target.classList.contains('performed-btn')) {
+      return
     }
+    const parent = target.closest('[data-task-id]');
+    const id = parent.getAttribute('data-task-id')
+    objOfTasks[id].completed = true;
+    perfomedTaskFromHtml(parent)
+  }
+
+  function onShowIncompleteTasks() {
+    let completeTasks = getCompleteTasks()
+
+    hideTasks(completeTasks)
+    checkEmptyListFrom(objOfTasks);
+  }
+
+  function getCompleteTasks() {
+    let completedTasks = [];
+    Object.keys(objOfTasks).forEach(id => {
+      if (objOfTasks[id].completed) {
+        completedTasks.push(objOfTasks[id])
+      }
+    })
+    return completedTasks
+  }
+
+  function hideTasks(tasks) {
+    tasks.forEach(task => {
+      hideTask(task._id)
+    })
+  }
+
+  function hideTask(taskId) {
+    const parent = document.querySelector(`[data-task-id="${taskId}"]`)
+    parent.classList.add('d-none')
   }
 })(tasks);
 
@@ -192,5 +261,11 @@ const tasks = [
 
 
 /*
-1. Это упрощает доступ к каждой задачи. Потому что будем знать id отдельной задачи и по ключу получить доступ к задаче - удалить, изменить и т.п.
-*/
+ (*) Это упрощает доступ к каждой задачи. Потому что будем знать id отдельной задачи и по ключу получить доступ к задаче - удалить, изменить и т.п.
+
+
+ //! ДЗ
+ 1. Если массив с задачами пустой то под формой нужно выводить сообщение об этом, также это же сообщение нужно выводить если вы удалите все задачи.
+ 2. В каждый элемент li добавить кнопку которая будет делать задачу выполненной. завершенные задачи должны быть подсвечены любым цветом.
+ 3. Добавить функционал отображения незавершенных задач и всех задач. т.е у вас будет две кнопки над таблицей 1-я "показать все задачи" и 2-я "показать незавершенные задачи", определить завершена задача или нет можно по полю completed в объекте задачи.  По умолчанию при загрузке отображаются все задачи. 
+ */

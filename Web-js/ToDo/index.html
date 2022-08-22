@@ -10,6 +10,7 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="style.css">
     <title>Todo List</title>
   </head>
   <body>
@@ -44,10 +45,15 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>  
     <div class="tasks-list-section mt-5">
       <div class="container">
+        <div class="d-flex justify-content-between mb-2">
+          <button class="btn btn-primary all-tasks">All tasks</button>
+          <button class="btn btn-primary incomplete-tasks">Incomplete tasks</button>
+        </div>
         <ul class="list-group">
+          <li class="list-group-item mt-2 d-none title-empty">Список пуст </li>
         </ul>
       </div>
     </div>
