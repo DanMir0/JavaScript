@@ -32,6 +32,11 @@ const tasks = [
 ];
 
 (function (arrOfTasks) {
+
+   const filter = {
+    type:'ALL'
+   };
+
   // Переобразовываем массив объектов в объект объектов. (*)
   const objOfTasks = arrOfTasks.reduce((acc, task) => {
     acc[task._id] = task
@@ -44,6 +49,8 @@ const tasks = [
   listContainer.style.background = "#f7f0f0";
 
   const incompleteTasksBtn = document.querySelector('.incomplete-tasks');
+  const allTasksBtn = document.querySelector('.all-tasks');
+  const  completeTasksBtn = document.querySelector('.complete-tasks')
 
   // Находим форму.
   const form = document.forms['addTask'];
@@ -54,28 +61,28 @@ const tasks = [
 
   // Events
   // Получает на вход объект задач.
-  checkEmptyListFrom(objOfTasks);
-  renderAllTasks(objOfTasks);
+  renderAllTasks();
   // На форму вешаем обработчик событий 'submit', функцию onFormSubmitHandler.
   form.addEventListener('submit', onFormSubmitHandler);
   // Повесили обработчик на весь список, в которой генерируется задача. Т.к. все элементы генерируются через JS и нет прямого доступа.
   listContainer.addEventListener('click', onDeletehandler);
   listContainer.addEventListener('click', onPerformedhandler);
   incompleteTasksBtn.addEventListener('click', onShowIncompleteTasks)
+  allTasksBtn.addEventListener('click', onShowTasks)
+  completeTasksBtn.addEventListener('click', onShowCompleteTasks)
 
-  function renderAllTasks(tasksList) {
+  function renderAllTasks() {
+    listContainer.textContent = ""
     // Проверят перед ли объект задачи.
-    if (!tasksList) {
-      console.error("Передайте список задач!");
-      return
-    }
+    const tasksList = filterListTasks()
+    checkEmptyListFrom(tasksList)
 
     // Создаем фрагмент, будущего списка задачими, для того чтобы не добавлять задачи по одной.
     // тем самым не вызывая каждый раз перерисовку дома.
     const fragment = document.createDocumentFragment();
 
     // Перебираем список задач.
-    Object.values(tasksList).forEach(task => {
+    Object.values(tasksList).sort((tru, fal) => tru.completed - fal.completed).forEach(task => {
 
       // На каждой итерации 1 задачу передаем передаем в функцию.
       // Где получаем 1 дом элемент наполненый.
@@ -89,10 +96,31 @@ const tasks = [
     listContainer.appendChild(fragment)
   }
 
+  function filterListTasks() {
+   
+    return Object.entries(objOfTasks).reduce((acc, keyArr) => {
+      let [key, task] = keyArr
+      if (filter.type === 'ALL') {
+        acc[key] = task
+      } else if (filter.type === 'INCOMPLETE' && objOfTasks[key].completed === false) {
+        acc[key] = task
+      } else if (filter.type === 'COMPLETE' && objOfTasks[key].completed === true) {
+        acc[key] = task
+      } 
+      return acc
+    },{})
+     
+  }
+
   // Занимается генерацией 1-го элемента списка, основыясь на нашей задачей,
   // которую сюда передали, основываясь на таске и возвращает li.
-  function listItemTemplate({ _id, title, body } = {}) {
+  function listItemTemplate({ _id, title, body, completed } = {}) {
     const li = document.createElement('li');
+  
+    if (completed) {
+      li.classList.add('bg-info');
+    }
+
     li.classList.add('list-group-item', 'mt-2')
     // При гинерации атрибут id добавляем на элемент, чтобы в дальйнешм опредять какой элемент нужно удалить.
     li.setAttribute('data-task-id', _id)
@@ -124,7 +152,6 @@ const tasks = [
 
     return li;
   }
-
 
   function onFormSubmitHandler(e) {
     // Отменяем перезагрузку страницы и отменяем отправку форму. (Прекращаем стандартное действие)
@@ -170,33 +197,32 @@ const tasks = [
     return { ...newTask }
   }
 
-  function deleteTask(id) {
-    // Вытягиваем title задачи для подтверждения удаления.
+  function confirmedDeleteTask(id) {
     const { title } = objOfTasks[id];
     const isConfirm = confirm(`Вы действительно хотите удалить задачу ${title}`);
-    if (!isConfirm) return isConfirm;
-    // Удаляем задачу из списка задач.
-    delete objOfTasks[id];
     return isConfirm;
   }
 
+  function deleteTask(id) {
+    // Удаляем задачу из списка задач.
+    delete objOfTasks[id];
+  }
+ 
   //! проверка на пустоту
   function checkEmptyListFrom(tasksList) {
+
     const emptyTitle = document.querySelector('.title-empty')
     if (!Object.keys(tasksList).length) {
       emptyTitle.classList.remove('d-none')
-    } 
+    } else {
+      emptyTitle.classList.add('d-none')
+    }
   }
 
   function deleteTaskFromHtml(confirmed, el) {
     // Если подверждения не было, то ничего не делаем, иначе удаляем.
     if (!confirmed) return;
     el.remove();
-  }
-
-  function perfomedTaskFromHtml(el) {
-    el.classList.add('.bg-info');
-    el.classList.toggle('bg-info')
   }
 
   // Определяет на кого произошел клик.
@@ -210,10 +236,11 @@ const tasks = [
      // Получаем id задачи.
      const id = parent.dataset.taskId;
      // Получаем статус удаления задачи (true, false).
-     const confirmed = deleteTask(id);
+     const confirmed = confirmedDeleteTask(id);
+    if (confirmed)  deleteTask(id)
+    renderAllTasks()
      // Передаем статус удаления и элемента, которого хотим удалить.
      deleteTaskFromHtml(confirmed, parent);
-     checkEmptyListFrom(objOfTasks);
   }
 
   //! ДЗ - 2 задачка
@@ -223,37 +250,28 @@ const tasks = [
     }
     const parent = target.closest('[data-task-id]');
     const id = parent.getAttribute('data-task-id')
-    objOfTasks[id].completed = true;
-    perfomedTaskFromHtml(parent)
+
+    objOfTasks[id].completed = !objOfTasks[id].completed;
+    renderAllTasks()
   }
 
   function onShowIncompleteTasks() {
-    let completeTasks = getCompleteTasks()
-
-    hideTasks(completeTasks)
-    checkEmptyListFrom(objOfTasks);
+    filter.type = "INCOMPLETE"
+    renderAllTasks()
   }
 
-  function getCompleteTasks() {
-    let completedTasks = [];
-    Object.keys(objOfTasks).forEach(id => {
-      if (objOfTasks[id].completed) {
-        completedTasks.push(objOfTasks[id])
-      }
-    })
-    return completedTasks
+  function onShowCompleteTasks() {
+    filter.type = "COMPLETE"
+    renderAllTasks()
   }
 
-  function hideTasks(tasks) {
-    tasks.forEach(task => {
-      hideTask(task._id)
-    })
+  function onShowTasks() {
+    filter.type = "ALL"
+    renderAllTasks()
   }
 
-  function hideTask(taskId) {
-    const parent = document.querySelector(`[data-task-id="${taskId}"]`)
-    parent.classList.add('d-none')
-  }
+ 
+
 })(tasks);
 
 
