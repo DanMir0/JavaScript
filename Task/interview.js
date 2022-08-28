@@ -32,29 +32,28 @@
 
 
 //! Нужно написать функцию, которая проверяет, являются ли две строки анаграммами, причем регистр букв не имеет значения. Учитываются лишь символы; пробелы или знаки препинания в расчет не берутся.
-const anagram = (strA, strB) => {
+//  const anagram = (strA, strB) => {
 
-    //! Вырезать пробелы
-    strA = strA.toLowerCase();
-    strB = strB.toLowerCase();
+//     strA = strA.toLowerCase().replace(/[\s.,%]/g, '');
+//     strB = strB.toLowerCase().replace(/[\s.,%]/g, '');
 
-    if (strA.length !== strB.length) {
-        return false
-    }
+//     if (strA.length !== strB.length) {
+//         return false
+//     }
 
-    let arr1 = strA.split("").sort()
-    let arr2 = strB.split("").sort()
+//     let arr1 = strA.split("").sort()
+//     let arr2 = strB.split("").sort()
 
-    for (let i = 0; i < arr2.length; i++) {
-        if (arr1[i] !== arr2[i]) {
-           return false
-        }
-    }
-    return true
-}
+//     for (let i = 0; i < arr2.length; i++) {
+//         if (arr1[i] !== arr2[i]) {
+//            return false
+//         }
+//     }
+//     return true
+// }
 
-console.log(anagram('finder', 'Friend') );// true
-console.log(anagram('hello', 'bye') );// false
+// console.log(anagram('finder w, wd', 'Friend wd, w') );// true
+// console.log(anagram('hello', 'bye') );// false
 
 //? Нужно написать функцию, принимающую строку в качестве аргумента и возвращающую количество гласных, которые содержатся в строке.
 //? Гласными являются «a», «e», «i», «o», «u».
