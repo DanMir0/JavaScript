@@ -33,15 +33,85 @@ const tasks = [
 
 (function (arrOfTasks) {
 
-   const filter = {
-    type:'ALL'
-   };
+  const themes = {
+    default: {
+      '--base-text-color': '#212529',
+      '--header-bg': '#007bff',
+      '--header-text-color': '#fff',
+      '--default-btn-bg': '#007bff',
+      '--default-btn-text-color': '#fff',
+      '--default-btn-hover-bg': '#0069d9',
+      '--default-btn-border-color': '#0069d9',
+      '--danger-btn-bg': '#dc3545',
+      '--danger-btn-text-color': '#fff',
+      '--danger-btn-hover-bg': '#bd2130',
+      '--danger-btn-border-color': '#dc3545',
+      '--input-border-color': '#ced4da',
+      '--input-bg-color': '#fff',
+      '--input-text-color': '#495057',
+      '--input-focus-bg-color': '#fff',
+      '--input-focus-text-color': '#495057',
+      '--input-focus-border-color': '#80bdff',
+      '--input-focus-box-shadow': '0 0 0 0.2rem rgba(0, 123, 255, 0.25)',
+    },
+    dark: {
+      '--base-text-color': '#212529',
+      '--header-bg': '#343a40',
+      '--header-text-color': '#fff',
+      '--default-btn-bg': '#58616b',
+      '--default-btn-text-color': '#fff',
+      '--default-btn-hover-bg': '#292d31',
+      '--default-btn-border-color': '#343a40',
+      '--default-btn-focus-box-shadow':
+        '0 0 0 0.2rem rgba(141, 143, 146, 0.25)',
+      '--danger-btn-bg': '#b52d3a',
+      '--danger-btn-text-color': '#fff',
+      '--danger-btn-hover-bg': '#88222c',
+      '--danger-btn-border-color': '#88222c',
+      '--input-border-color': '#ced4da',
+      '--input-bg-color': '#fff',
+      '--input-text-color': '#495057',
+      '--input-focus-bg-color': '#fff',
+      '--input-focus-text-color': '#495057',
+      '--input-focus-border-color': '#78818a',
+      '--input-focus-box-shadow': '0 0 0 0.2rem rgba(141, 143, 146, 0.25)',
+    },
+    light: {
+      '--base-text-color': '#212529',
+      '--header-bg': '#fff',
+      '--header-text-color': '#212529',
+      '--default-btn-bg': '#fff',
+      '--default-btn-text-color': '#212529',
+      '--default-btn-hover-bg': '#e8e7e7',
+      '--default-btn-border-color': '#343a40',
+      '--default-btn-focus-box-shadow':
+        '0 0 0 0.2rem rgba(141, 143, 146, 0.25)',
+      '--danger-btn-bg': '#f1b5bb',
+      '--danger-btn-text-color': '#212529',
+      '--danger-btn-hover-bg': '#ef808a',
+      '--danger-btn-border-color': '#e2818a',
+      '--input-border-color': '#ced4da',
+      '--input-bg-color': '#fff',
+      '--input-text-color': '#495057',
+      '--input-focus-bg-color': '#fff',
+      '--input-focus-text-color': '#495057',
+      '--input-focus-border-color': '#78818a',
+      '--input-focus-box-shadow': '0 0 0 0.2rem rgba(141, 143, 146, 0.25)',
+    },
+  };
+
+  let lastSelectedTheme = "default"
+
+  const filter = {
+    type: 'ALL'
+  };
 
   // Переобразовываем массив объектов в объект объектов. (*)
   const objOfTasks = arrOfTasks.reduce((acc, task) => {
     acc[task._id] = task
     return acc
   }, {})
+
 
   // Elemts UI.
   // Нашли контейнер, куда будем добавлять задачи.
@@ -50,8 +120,8 @@ const tasks = [
 
   const incompleteTasksBtn = document.querySelector('.incomplete-tasks');
   const allTasksBtn = document.querySelector('.all-tasks');
-  const  completeTasksBtn = document.querySelector('.complete-tasks')
-
+  const completeTasksBtn = document.querySelector('.complete-tasks')
+  const themeSelect = document.getElementById('themeSelect')
   // Находим форму.
   const form = document.forms['addTask'];
   // Находим inputTitle через форму.
@@ -70,6 +140,7 @@ const tasks = [
   incompleteTasksBtn.addEventListener('click', onShowIncompleteTasks)
   allTasksBtn.addEventListener('click', onShowTasks)
   completeTasksBtn.addEventListener('click', onShowCompleteTasks)
+  themeSelect.addEventListener('change', onThemeSelectHandler)
 
   function renderAllTasks() {
     listContainer.textContent = ""
@@ -97,7 +168,7 @@ const tasks = [
   }
 
   function filterListTasks() {
-   
+
     return Object.entries(objOfTasks).reduce((acc, keyArr) => {
       let [key, task] = keyArr
       if (filter.type === 'ALL') {
@@ -106,17 +177,17 @@ const tasks = [
         acc[key] = task
       } else if (filter.type === 'COMPLETE' && objOfTasks[key].completed === true) {
         acc[key] = task
-      } 
+      }
       return acc
-    },{})
-     
+    }, {})
+
   }
 
   // Занимается генерацией 1-го элемента списка, основыясь на нашей задачей,
   // которую сюда передали, основываясь на таске и возвращает li.
   function listItemTemplate({ _id, title, body, completed } = {}) {
     const li = document.createElement('li');
-  
+
     if (completed) {
       li.classList.add('bg-info');
     }
@@ -144,8 +215,8 @@ const tasks = [
     const divGroupBtn = document.createElement('div');
     divGroupBtn.classList.add('d-flex', 'justify-content-between')
     divGroupBtn.appendChild(performedBtn);
-    divGroupBtn.appendChild(deleteBtn);  
-   
+    divGroupBtn.appendChild(deleteBtn);
+
     li.appendChild(span);
     li.appendChild(article);
     li.appendChild(divGroupBtn);
@@ -207,7 +278,7 @@ const tasks = [
     // Удаляем задачу из списка задач.
     delete objOfTasks[id];
   }
- 
+
   //! проверка на пустоту
   function checkEmptyListFrom(tasksList) {
 
@@ -230,17 +301,17 @@ const tasks = [
     // Если по кнопке.
     if (!target.classList.contains('delete-btn')) {
       return
-    } 
-     // То находим родителя кнопки.
-     const parent = target.closest('[data-task-id]');
-     // Получаем id задачи.
-     const id = parent.dataset.taskId;
-     // Получаем статус удаления задачи (true, false).
-     const confirmed = confirmedDeleteTask(id);
-    if (confirmed)  deleteTask(id)
+    }
+    // То находим родителя кнопки.
+    const parent = target.closest('[data-task-id]');
+    // Получаем id задачи.
+    const id = parent.dataset.taskId;
+    // Получаем статус удаления задачи (true, false).
+    const confirmed = confirmedDeleteTask(id);
+    if (confirmed) deleteTask(id)
     renderAllTasks()
-     // Передаем статус удаления и элемента, которого хотим удалить.
-     deleteTaskFromHtml(confirmed, parent);
+    // Передаем статус удаления и элемента, которого хотим удалить.
+    deleteTaskFromHtml(confirmed, parent);
   }
 
   //! ДЗ - 2 задачка
@@ -270,7 +341,23 @@ const tasks = [
     renderAllTasks()
   }
 
- 
+  function onThemeSelectHandler() {
+    const selectedTheme = themeSelect.value;
+    const isConfirm = confirm(`Вы действительно хотите поменять тему на ${selectedTheme}`)
+    if (!isConfirm) {
+      themeSelect.value = lastSelectedTheme
+       return
+    }
+    setTheme(selectedTheme)
+    lastSelectedTheme = selectedTheme;
+  }
+
+  function setTheme(name) {
+    const selectedThemObj = themes[name]
+    Object.entries(selectedThemObj).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value)
+    })
+  }
 
 })(tasks);
 
