@@ -100,7 +100,7 @@ const tasks = [
     },
   };
 
-  let lastSelectedTheme = "default"
+  let lastSelectedTheme = localStorage.getItem('app_theme') || 'default'
 
   const filter = {
     type: 'ALL'
@@ -131,6 +131,7 @@ const tasks = [
 
   // Events
   // Получает на вход объект задач.
+  setTheme(lastSelectedTheme);
   renderAllTasks();
   // На форму вешаем обработчик событий 'submit', функцию onFormSubmitHandler.
   form.addEventListener('submit', onFormSubmitHandler);
@@ -350,6 +351,7 @@ const tasks = [
     }
     setTheme(selectedTheme)
     lastSelectedTheme = selectedTheme;
+    localStorage.setItem('app_theme', selectedTheme)
   }
 
   function setTheme(name) {
