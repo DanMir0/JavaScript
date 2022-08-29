@@ -104,3 +104,18 @@
     
 // }
 // console.log(fibonacci(0));
+
+//?  Реализовать методы, которые в процессе выполнения строки (2).plus(3).minus(1) дали бы на выходе 4.
+// Number.prototype.plus = function(value) {
+//     return this + value
+// }
+
+// Number.prototype.minus = function(value) {
+//     return this - value
+// }
+
+//?  Дана функция, она принимает в качестве аргументов строки '*', '1', 'b', '1c', реализуйте ее так, что бы она вернула строку '1*b*1c'
+function getStr(str) {
+    return [].slice.call(arguments, 1).join(arguments[0])
+}
+console.log(getStr('*', '1', 'b', '1c',));
