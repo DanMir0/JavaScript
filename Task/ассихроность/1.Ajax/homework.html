@@ -18,7 +18,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Add user</h5>
-                            <form>
+                            <form id="signup-form">
                                 <div class="mb-3">
                                     <label for="exampleInputName" class="form-label">Name</label>
                                     <input type="text" class="form-control" id="exampleInputName"
@@ -39,8 +39,13 @@
                                     <input type="text" class="form-control" id="exampleInputUsername"
                                         aria-describedby="usernameHelp">
                                 </div>
-                                <label for="exampleInputWebsite" class="form-label">Website</label>
-                                <div class="input-group mb-3">
+                                <div class="mb-3">
+                                    <label for="exampleInputWebsite" class="form-label">Website</label>
+                                    <input type="text" class="form-control" id="exampleInputWebsite"
+                                        aria-describedby="websiteHelp">
+                                </div>
+                                <!-- <label for="exampleInputWebsite" class="form-label">Website</label> -->
+                                <!-- <div class="input-group mb-3">
                                     <input type="text" class="form-control" aria-describedby="basic-addon2">
                                     <span class="input-group-text">@</span>
                                     <select class="form-select">
@@ -54,9 +59,9 @@
                                         <option value=".io">.io</option>
                                         <option value=".me">.me</option>
                                     </select>
-                                </div>
+                                </div> -->
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">Зарегестрироваться</button>
+                                    <button class="btn btn-primary btn-add-post">Зарегестрироваться</button>
                                   </div>
                             </form>
                         </div>
@@ -65,9 +70,9 @@
             </div>
         </div>
     </div>
-    <div class="container d-flex justify-content-center mt-5">
+    <!-- <div class="container d-flex justify-content-center mt-5"> -->
         <button id="showUser" type="button" class="btn btn-primary">Show users</button>
-    </div>
+    <!-- </div> -->
     <div class="container mt-5">
     </div>
     <script src="./homework.js"></script>
