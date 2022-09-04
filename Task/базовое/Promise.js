@@ -15,19 +15,88 @@
 //   });
 
 //? Перепишите один из примеров раздела Цепочка промисов, используя async/await вместо .then/catch:
-async function loadJson(url) {
-  return fetch(url)
-  .then(response => {
-    if (response.status == 200) {
-      return response.json();
-    } else {
-      throw new Error(response.status);
-    }
-  })
+// function loadJson(url) {
+//   return fetch(url)
+//     .then(response => {
+//       if (response.status == 200) {
+//         return response.json();
+//       } else {
+//         throw new Error(response.status);
+//       } 
+//     })
+// }
 
+// async function loadJson(url) {
+//   let response = await fetch(url)
+  
+//   if (response.status == 200) {
+//     return await response.json()
+//   } else {
+//     throw new Error(response.status)
+//   }
+// }
+
+// loadJson('no-such-user.json') // (3)
+//   .catch(alert); // Error: 404
+
+
+//? Перепишите, используя async/await
+//? В функции demoGithubUser замените рекурсию на цикл: используя async/await, сделать это будет просто.
+class HttpError extends Error {
+  constructor(response) {
+    super(`${response.status} for ${response.url}`);
+    this.name = 'HttpError';
+    this.response = response;
+  }
 }
-loadJson('no-such-user.json') // (3)
-  .catch(alert); // Error: 404
+
+function loadJson(url) {
+  return fetch(url)
+    .then(response => {
+      if (response.status == 200) {
+        return response.json();
+      } else {
+        throw new HttpError(response);
+      }
+    })
+}
+
+// Запрашивать логин, пока github не вернёт существующего пользователя.
+function demoGithubUser() {
+  let name = prompt("Введите логин?", "iliakan");
+
+  return loadJson(`https://api.github.com/users/${name}`)
+    .then(user => {
+      alert(`Полное имя: ${user.name}.`);
+      return user;
+    })
+    .catch(err => {
+      if (err instanceof HttpError && err.response.status == 404) {
+        alert("Такого пользователя не существует, пожалуйста, повторите ввод.");
+        return demoGithubUser();
+      } else {
+        throw err;
+      }
+    });
+}
+
+demoGithubUser();
+
+
+//? Создать функцию, которая возвращает промис.  Функция принимает два аргумента - время, через которое промис должен выполниться, и значение, с которым промис будет выполнен. 
+// function promiseCreator(time, msg) {
+//   return new Promise((resolve, reject) => {
+//    setTimeout( () => {
+//     resolve(msg)
+//    }, time)
+//   })
+// }
+// const prom = promiseCreator(10000, 'Ok!');
+// prom.then(console.log);
+
+
+
+
 
 // function one() { console.log(1); }
 // function two() {
@@ -55,5 +124,5 @@ loadJson('no-such-user.json') // (3)
 
 
 
-  
+
 
